@@ -83,7 +83,7 @@ with st.sidebar:
             "kod": st.column_config.TextColumn("Fon Kodu", max_chars=3, help="TEFAS Kodu (Örn: TTE)"),
             "adet": st.column_config.NumberColumn("Adet", min_value=0, step=1, format="%d")
         },
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         key="fund_editor"
     )
@@ -154,14 +154,14 @@ else:
         # Aggregating by Fund Code in case of duplicates in list
         df_pie = df_portfolio.groupby("Fon Kodu")["Toplam Değer"].sum().reset_index()
         fig_pie = px.pie(df_pie, values='Toplam Değer', names='Fon Kodu', hole=0.4)
-        st.plotly_chart(fig_pie, use_container_width=True)
+        st.plotly_chart(fig_pie, width="stretch")
     
     with c2:
         st.subheader("� Kategori Dağılımı")
         if "Kategori" in df_portfolio.columns:
             df_cat = df_portfolio.groupby("Kategori")["Toplam Değer"].sum().reset_index()
             fig_cat = px.pie(df_cat, values='Toplam Değer', names='Kategori', hole=0.4)
-            st.plotly_chart(fig_cat, use_container_width=True)
+            st.plotly_chart(fig_cat, width="stretch")
         else:
             st.info("Kategori verisi bulunamadı.")
             
@@ -173,7 +173,7 @@ else:
         df_history['Date'] = pd.to_datetime(df_history['Date'])
         fig_line = px.line(df_history, x='Date', y='TotalValue', markers=True)
         fig_line.update_layout(xaxis_title="Tarih", yaxis_title="Toplam Değer (TL)")
-        st.plotly_chart(fig_line, use_container_width=True)
+        st.plotly_chart(fig_line, width="stretch")
     else:
         st.info("Henüz tarihsel veri yok.")
     
@@ -196,7 +196,7 @@ else:
     
     st.dataframe(
         df_filtered[cols],
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         column_config={
             "Fon Kodu": st.column_config.TextColumn("Fon Kodu"),

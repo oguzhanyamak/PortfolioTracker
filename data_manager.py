@@ -48,11 +48,24 @@ def save_all_funds(funds_list):
     # Ensure standard format (upper case codes, float quantities)
     clean_list = []
     for f in funds_list:
-        if f.get("kod") and f.get("adet", 0) > 0:
-            clean_list.append({
-                "kod": f["kod"].upper(),
-                "adet": float(f["adet"])
-            })
+        # Handle pandas NaN and empty values
+        kod = f.get("kod")
+        adet = f.get("adet")
+        
+        # Skip if kod is empty/None or adet is invalid
+        if not kod or pd.isna(kod):
+            continue
+            
+        # Convert adet to float, skip if invalid
+        try:
+            adet_float = float(adet) if not pd.isna(adet) else 0
+            if adet_float > 0:
+                clean_list.append({
+                    "kod": str(kod).upper().strip(),
+                    "adet": adet_float
+                })
+        except (ValueError, TypeError):
+            continue
             
     with open(FUNDS_FILE, "w", encoding="utf-8") as f:
         json.dump(clean_list, f, indent=4)
