@@ -124,7 +124,17 @@ def get_portfolio_data(funds_config):
     data = []
     
     # 1. Identify unique codes to avoid redundant fetching
-    unique_codes = list(set(f["kod"] for f in funds_config))
+    # Normalize codes: handle cases where data_editor returns lists
+    normalized_codes = []
+    for f in funds_config:
+        kod = f.get("kod")
+        # If kod is a list, take first element; otherwise use as-is
+        if isinstance(kod, list):
+            kod = kod[0] if kod else None
+        if kod:
+            normalized_codes.append(str(kod).strip().upper())
+    
+    unique_codes = list(set(normalized_codes))
     # Cache stores tuple: (price, daily_return_percent, category)
     price_cache = {}
 
@@ -144,8 +154,20 @@ def get_portfolio_data(funds_config):
 
     # 3. Build DataFrame
     for fund in funds_config:
-        kod = fund["kod"]
-        adet = fund["adet"]
+        kod = fund.get("kod")
+        adet = fund.get("adet")
+        
+        # Normalize kod (handle list values from data_editor)
+        if isinstance(kod, list):
+            kod = kod[0] if kod else None
+        if kod:
+            kod = str(kod).strip().upper()
+        else:
+            continue
+            
+        # Normalize adet
+        if isinstance(adet, list):
+            adet = adet[0] if adet else 0
         
         if kod in price_cache:
             fiyat, gunluk_getiri_yuzde, kategori = price_cache[kod]
