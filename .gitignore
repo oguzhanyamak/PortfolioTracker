@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific - SENSITIVE DATA
+funds.json
+portfolio_history.csv
+genel_toplam.txt
+.streamlit/secrets.toml
+
+# Backup files
+*.bak
+*.backup
+
+# Debug files
+debug_*.py
+verify_*.py
+benchmark_*.py
+migrate_*.py
+dedupe_*.py
