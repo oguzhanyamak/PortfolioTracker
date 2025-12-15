@@ -1,7 +1,5 @@
 # 📈 TEFAS Portföy Takipçisi
 
-Türkiye Elektronik Fon Alım Satım Platformu (TEFAS) fonlarınızı takip etmek için geliştirilmiş modern bir web uygulaması.
-
 ## 🌟 Özellikler
 
 - 📊 **Gerçek Zamanlı Fon Takibi**: TEFAS'tan anlık fon fiyatları
@@ -55,11 +53,3 @@ Bu uygulama kişisel portföy verilerinizi içerir. Public deployment yaparken:
 ## 📄 Lisans
 
 Bu proje kişisel kullanım içindir.
-
-## 🤝 Katkıda Bulunma
-
-Pull request'ler kabul edilir. Büyük değişiklikler için önce bir issue açın.
-
----
-
-**Not**: Bu uygulama TEFAS web sitesinden veri çeker. TEFAS'ın kullanım koşullarına uygun kullanın.
