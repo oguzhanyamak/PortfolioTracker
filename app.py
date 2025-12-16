@@ -8,23 +8,20 @@ st.set_page_config(page_title="Portföy Takip", page_icon="📈", layout="wide")
 
 st.title("📈 TEFAS Portföy Takipçisi")
 
-# Custom CSS to increase sidebar width and improve mobile responsiveness
+# Custom CSS for better mobile responsiveness
 st.markdown(
     """
     <style>
     /* Desktop sidebar */
-    [data-testid="stSidebar"] {
-        min-width: 350px;
-        max-width: 500px;
+    @media (min-width: 769px) {
+        [data-testid="stSidebar"] {
+            min-width: 350px;
+            max-width: 500px;
+        }
     }
     
     /* Mobile optimizations */
     @media (max-width: 768px) {
-        [data-testid="stSidebar"] {
-            min-width: 100%;
-            max-width: 100%;
-        }
-        
         /* Smaller font sizes on mobile */
         .stMarkdown h1 {
             font-size: 1.5rem !important;
@@ -54,16 +51,14 @@ st.markdown(
             font-size: 0.9rem !important;
         }
         
-        /* Compact data editor */
+        /* Compact data editor and tables */
         [data-testid="stDataFrame"] {
             font-size: 0.85rem !important;
         }
-    }
-    
-    /* Hide sidebar toggle on desktop for cleaner look */
-    @media (min-width: 769px) {
-        [data-testid="collapsedControl"] {
-            display: none;
+        
+        /* Ensure sidebar doesn't interfere on mobile */
+        [data-testid="stSidebar"] {
+            width: auto !important;
         }
     }
     </style>
