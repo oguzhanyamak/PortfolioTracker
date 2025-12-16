@@ -8,13 +8,63 @@ st.set_page_config(page_title="Portföy Takip", page_icon="📈", layout="wide")
 
 st.title("📈 TEFAS Portföy Takipçisi")
 
-# Custom CSS to increase sidebar width
+# Custom CSS to increase sidebar width and improve mobile responsiveness
 st.markdown(
     """
     <style>
+    /* Desktop sidebar */
     [data-testid="stSidebar"] {
         min-width: 350px;
         max-width: 500px;
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+        [data-testid="stSidebar"] {
+            min-width: 100%;
+            max-width: 100%;
+        }
+        
+        /* Smaller font sizes on mobile */
+        .stMarkdown h1 {
+            font-size: 1.5rem !important;
+        }
+        
+        .stMarkdown h2 {
+            font-size: 1.3rem !important;
+        }
+        
+        .stMarkdown h3 {
+            font-size: 1.1rem !important;
+        }
+        
+        /* Better spacing */
+        .element-container {
+            margin-bottom: 0.5rem !important;
+        }
+        
+        /* Responsive metrics */
+        [data-testid="stMetricValue"] {
+            font-size: 1.2rem !important;
+        }
+        
+        /* Touch-friendly buttons */
+        .stButton button {
+            min-height: 44px !important;
+            font-size: 0.9rem !important;
+        }
+        
+        /* Compact data editor */
+        [data-testid="stDataFrame"] {
+            font-size: 0.85rem !important;
+        }
+    }
+    
+    /* Hide sidebar toggle on desktop for cleaner look */
+    @media (min-width: 769px) {
+        [data-testid="collapsedControl"] {
+            display: none;
+        }
     }
     </style>
     """,
@@ -147,28 +197,26 @@ else:
     st.markdown("---")
     
     # --- CHARTS SECTION ---
-    c1, c2 = st.columns([1, 1])
+    # Use single column on mobile (auto-detected by Streamlit)
+    st.subheader("🍰 Fon Bazlı Dağılım")
+    df_pie = df_portfolio.groupby("Fon Kodu")["Toplam Değer"].sum().reset_index()
+    fig_pie = px.pie(df_pie, values='Toplam Değer', names='Fon Kodu', hole=0.4)
+    fig_pie.update_layout(height=350, margin=dict(l=20, r=20, t=40, b=20))
+    st.plotly_chart(fig_pie, width="stretch")
     
-    with c1:
-        st.subheader("🍰 Fon Bazlı Dağılım")
-        # Aggregating by Fund Code in case of duplicates in list
-        df_pie = df_portfolio.groupby("Fon Kodu")["Toplam Değer"].sum().reset_index()
-        fig_pie = px.pie(df_pie, values='Toplam Değer', names='Fon Kodu', hole=0.4)
-        st.plotly_chart(fig_pie, width="stretch")
-    
-    with c2:
-        st.subheader("� Kategori Dağılımı")
-        if "Kategori" in df_portfolio.columns:
-            df_cat = df_portfolio.groupby("Kategori")["Toplam Değer"].sum().reset_index()
-            fig_cat = px.pie(df_cat, values='Toplam Değer', names='Kategori', hole=0.4)
-            st.plotly_chart(fig_cat, width="stretch")
-        else:
-            st.info("Kategori verisi bulunamadı.")
+    st.subheader("📊 Kategori Dağılımı")
+    if "Kategori" in df_portfolio.columns:
+        df_cat = df_portfolio.groupby("Kategori")["Toplam Değer"].sum().reset_index()
+        fig_cat = px.pie(df_cat, values='Toplam Değer', names='Kategori', hole=0.4)
+        fig_cat.update_layout(height=350, margin=dict(l=20, r=20, t=40, b=20))
+        st.plotly_chart(fig_cat, width="stretch")
+    else:
+        st.info("Kategori verisi bulunamadı.")
             
     st.markdown("---")
     
     # --- HISTORY CHART ---
-    st.subheader("�📅 Tarihsel Gelişim")
+    st.subheader("🗓️ Tarihsel Gelişim")
     if not df_history.empty:
         df_history['Date'] = pd.to_datetime(df_history['Date'])
         fig_line = px.line(df_history, x='Date', y='TotalValue', markers=True)

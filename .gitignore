@@ -34,5 +34,7 @@ genel_toplam.txt
 debug_*.py
 verify_*.py
 benchmark_*.py
-migrate_*.py
 dedupe_*.py
+
+# Migration scripts are kept
+!migrate_to_mongodb.py

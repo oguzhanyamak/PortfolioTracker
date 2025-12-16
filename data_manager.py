@@ -5,70 +5,32 @@ import os
 import json
 from datetime import datetime
 from config import TEFAS_URL, XPATH_PRICE, XPATH_DAILY_RETURN, XPATH_CATEGORY, HISTORY_FILE
+from db_manager import (
+    load_funds_from_db,
+    save_fund_to_db,
+    save_all_funds_to_db,
+    delete_fund_from_db,
+    save_daily_total_to_db,
+    get_history_from_db
+)
 
-FUNDS_FILE = "funds.json"
+FUNDS_FILE = "funds.json"  # Kept for backward compatibility, not used
 
 def load_funds():
-    """Loads funds from the JSON file."""
-    if not os.path.exists(FUNDS_FILE):
-        return []
-    with open(FUNDS_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+    """Loads funds from MongoDB."""
+    return load_funds_from_db()
 
 def save_fund(code, qty):
-    """Adds or updates a fund in the JSON file."""
-    funds = load_funds()
-    code = code.upper()
-    
-    # Check if exists, update if so
-    found = False
-    for f in funds:
-        if f["kod"] == code:
-            f["adet"] = qty
-            found = True
-            break
-    
-    if not found:
-        funds.append({"kod": code, "adet": qty})
-        
-    with open(FUNDS_FILE, "w", encoding="utf-8") as f:
-        json.dump(funds, f, indent=4)
-
-def delete_fund(code):
-    """Deletes a fund from the JSON file."""
-    funds = load_funds()
-    code = code.upper()
-    funds = [f for f in funds if f["kod"] != code]
-    
-    with open(FUNDS_FILE, "w", encoding="utf-8") as f:
-        json.dump(funds, f, indent=4)
+    """Adds or updates a fund in MongoDB."""
+    return save_fund_to_db(code, qty)
 
 def save_all_funds(funds_list):
-    """Overwrites the JSON file with the provided list of funds."""
-    # Ensure standard format (upper case codes, float quantities)
-    clean_list = []
-    for f in funds_list:
-        # Handle pandas NaN and empty values
-        kod = f.get("kod")
-        adet = f.get("adet")
-        
-        # Skip if kod is empty/None or adet is invalid
-        if not kod or pd.isna(kod):
-            continue
-            
-        # Convert adet to float, skip if invalid
-        try:
-            adet_float = float(adet) if not pd.isna(adet) else 0
-            if adet_float > 0:
-                clean_list.append({
-                    "kod": str(kod).upper().strip(),
-                    "adet": adet_float
-                })
-        except (ValueError, TypeError):
-            continue
-            
-    with open(FUNDS_FILE, "w", encoding="utf-8") as f:
-        json.dump(clean_list, f, indent=4)
+    """Overwrites funds in MongoDB with the provided list."""
+    return save_all_funds_to_db(funds_list)
+
+def delete_fund(code):
+    """Deletes a fund from MongoDB."""
+    return delete_fund_from_db(code)
 
 
 def fetch_fund_price(fund_code):
@@ -192,26 +154,10 @@ def get_portfolio_data(funds_config):
     return pd.DataFrame(data)
 
 def save_daily_total(total_value):
-    """Saves the today's total value to a CSV file for historical tracking."""
-    today = datetime.now().strftime("%Y-%m-%d")
-    
-    # Check if file exists to read it first
-    if os.path.exists(HISTORY_FILE):
-        df = pd.read_csv(HISTORY_FILE)
-    else:
-        df = pd.DataFrame(columns=["Date", "TotalValue"])
-    
-    # Check if we already have an entry for today, update it if so
-    if today in df["Date"].values:
-        df.loc[df["Date"] == today, "TotalValue"] = total_value
-    else:
-        new_row = pd.DataFrame([{"Date": today, "TotalValue": total_value}])
-        df = pd.concat([df, new_row], ignore_index=True)
-    
-    df.to_csv(HISTORY_FILE, index=False)
-    return df
+    """Saves today's total value to MongoDB for historical tracking."""
+    return save_daily_total_to_db(total_value)
 
 def get_history_df():
-    if os.path.exists(HISTORY_FILE):
-        return pd.read_csv(HISTORY_FILE)
-    return pd.DataFrame(columns=["Date", "TotalValue"])
+    """Get portfolio history from MongoDB."""
+    return get_history_from_db()
+
